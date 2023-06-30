@@ -8,8 +8,14 @@ map<string, Type> Lexer::words;
 map<char, Type> Lexer::singleOp;
 map<string, Type> Lexer::ops;
 
-void Lexer::initLookups() {
-    words["create"] = CREATE;
+Token Lexer::scanNumber()
+{
+	return Token();
+}
+
+void Lexer::initLookups()
+{
+	words["create"] = CREATE;
     words["table"] = TABLE;
 	words["auto_increment"] = AUTO_INCREMENT;
     words["int"] = INT;
@@ -64,12 +70,20 @@ bool Lexer::isOp (char ch) const {
 Token Lexer::next() {
     while(!isEnd()) {
         if (isdigit(peek)) {  // numbers
-            num_buffer = 0;
-            do {
-                num_buffer = num_buffer * 10 + advance() - '0';
-            } while (isdigit(peek));
+			int count = 0;
+			memset(buffer, '\0', sizeof(buffer));
+			do {
+                buffer[count++] = advance();
+            } while (count < BUF_SIZE \
+			  && (isdigit(peek) || peek == '.' || peek == 'e' || peek == '+' || peek == 'e'));
+			string str(buffer);
+			return Token(NUM, str.c_str(), str.size());
 
-            return Token(NUM, &num_buffer, sizeof(int));
+            // num_buffer = 0;
+            // do {
+            //     num_buffer = num_buffer * 10 + advance() - '0';
+            // } while (isdigit(peek) || );
+            // return Token(NUM, &num_buffer, sizeof(int));
         } else if (isalpha(peek) || peek == '_') {  // keywords or identifilers
             memset(buffer, '\0', sizeof(buffer));
             int count = 0;
@@ -82,6 +96,8 @@ Token Lexer::next() {
             }
 
             string str(buffer);
+
+			//TODO:case insensitive
             for (size_t i = 0; i < str.size(); ++i) {
                 str[i] = tolower(str[i]); // case insensitive
             }
@@ -120,7 +136,23 @@ Token Lexer::next() {
             }
 
             return Token(ops[str]);
-        } else {  // error
+        } 
+		//解析单引号包裹的文本
+		else if(peek == '\'')
+		{
+			memset(buffer, '\0', sizeof(buffer));
+            int count = 0;
+            do {
+                buffer[count++] = advance();
+            } while (peek != '\'');
+			//TODO: 有没有优雅点的方式
+			buffer[count++] = advance();
+            string str(buffer);
+
+			return Token(CHARS, str.c_str(), str.size());
+
+		}
+		else {  // error
             string msg = "Invalid lexeme ";
             msg.push_back(advance());
             throw LexError(msg);

@@ -15,7 +15,7 @@ using std::map;
 
 // keywords and operators
 enum Type {
-    ID, NUM, CREATE, TABLE, AUTO_INCREMENT, INT, UNSIGNED, DEFAULT, PRIMARY, KEY, INSERT,
+    ID, NUM, CHARS, CREATE, TABLE, AUTO_INCREMENT, INT, UNSIGNED, DEFAULT, PRIMARY, KEY, INSERT, IGNORE,
     INTO, VALUES, DELETE, FROM, WHERE, SELECT, ASSIGN, LT, GT, NEQ, EQ,
     GEQ, LEQ, PLUS, MINUS, MUL, DIV, AND, OR, NOT, L_PAREN, R_PAREN,
     COMMA, SEMICOLON, END, NONE
@@ -50,9 +50,10 @@ public:
     Token(Type _type=NONE, const void *raw=NULL, const int size=0);
     Token(const Token &other);
 
+	//TODO:不要这个校验??
     // number or identifier
     bool isValue(Type t) const {  // number or identifier
-        return t == NUM || t == ID;
+        return t == NUM || t == ID || t == CHARS;
     }
 
     Type getType() const {
@@ -64,7 +65,10 @@ public:
     // For keywords or operators. Need to guarded by !isValue(getType())
     Type getKeyword() const;
     // For numbers. Need to guarded by getType() == NUM
-    int getNumber() const;
+    //int getNumber() const;
+	//TODO: data 赋值过程涉及到太多数据拷贝
+	//我也不需要这么多getxxx
+	std::string getNumber() const;
 
     // Check type
     bool operator== (Type rhs) const {

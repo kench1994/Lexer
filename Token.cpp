@@ -12,7 +12,7 @@ Token::Token(Type _type, const void *raw, const int size) {
             type = _type;
 
             real_size = size / sizeof(char);
-            if (type == ID) {
+            if (type == ID || type == NUM || type == CHARS) {
                 real_size++;  // '\0'
             }
 
@@ -38,6 +38,7 @@ Token::Token(const Token &other) {
     }
 }
 
+//TODO:补充 AUTO_INCREMENT 那些
 void Token::initNameMap() {
     name[ID] = "ID";
     name[NUM] = "NUM";
@@ -48,6 +49,7 @@ void Token::initNameMap() {
     name[PRIMARY] = "PRIMARY";
     name[KEY] = "KEY";
     name[INSERT] = "INSERT";
+	name[IGNORE] = "IGNORE";
     name[INTO] = "INTO";
     name[VALUES] = "VALUES";
     name[DELETE] = "DELETE";
@@ -95,14 +97,15 @@ Type Token::getKeyword() const {
 }
 
 // numbers
-int Token::getNumber() const {
-    if (type != NUM) {
-        throw TokenError("Expected number, get otherwise");
-    } else {
-        int result = 0;
-        memcpy(&result, data, sizeof(int));
-        return result;
-    }
+string Token::getNumber() const {
+    //if (type != NUM) {
+    //    throw TokenError("Expected number, get otherwise");
+   // } else {
+        return string(data);
+        // int result = 0;
+        // memcpy(&result, data, sizeof(int));
+        // return result;
+   // }
 }
 
 ostream &operator<<(ostream &s, const Token &token) {
@@ -112,10 +115,10 @@ ostream &operator<<(ostream &s, const Token &token) {
 
     Type type = token.type;
     string token_name = Token::name[type];
-
+	//TODO
     if (type == ID) {
         s << "(" << token_name << ", " << token.getId() << ")";
-    } else if (type == NUM) {
+    } else if (type == NUM || type == CHARS) {
         s << "(" << token_name << ", " << token.getNumber() << ")";
     } else {
         s << token_name;

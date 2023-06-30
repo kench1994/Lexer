@@ -69,12 +69,40 @@ public:
     // operators that can be determined by one character
     static map<char, Type> singleOp;
     static map<string, Type> ops;  // other operators
+
+protected:
+
+	/**
+	 * @brief  尝试扫描 数值类型
+	 * @date   2023-06-30
+	 * @author huangchao
+	 * @return Token 
+	 *      01. 123456
+            02. 123.456
+            03. 123.456e3
+            04. 123.456E3
+            05. 123.456e+3
+            06. 123.456E+3
+            07. 123.456e-3
+            08. 123.456E-3
+			//下面的还不支持
+            09. .1234
+            10. .1234e3
+            11. .1234E+3
+            12. .1234e+3
+            13. .1234E-3
+            14. .1234e-3
+	 */
+	Token scanNumber();
+
 private:
     static void initLookups();  // init the maps
 
     char peek;  // next character to read by advance()
     char buffer[BUF_SIZE];  // for keywords, operators etc.
-    int num_buffer;  // for accumulating numbers
+	//2023年6月30日14:59:24 discard by huangc
+	//i don't need get number numerical type even at all
+    //int num_buffer;  // for accumulating numbers
     int line;  // line number
     int col; // column number
     istream &stream;  // stream for lexer

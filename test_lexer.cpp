@@ -16,6 +16,8 @@ int main(int argc, char const *argv[]) {
     ofstream out;
     ifstream in;  // must be in the scope until stop scanning
 
+	std::deque<Token> token_list;
+
     if (argc > 1) {
         in.open(argv[1], ifstream::in);
         if (in.is_open()) {
@@ -31,6 +33,7 @@ int main(int argc, char const *argv[]) {
     Lexer &lexer = *lexptr;
     Token lookahead = lexer.next();
     while (lookahead != END) {
+		token_list.push_back(lookahead);
         try {
             cout << lookahead << '\n';
             lookahead = lexer.next();
